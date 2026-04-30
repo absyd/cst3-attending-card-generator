@@ -8,7 +8,7 @@ interface CardEditorProps {
   offsetX: number;
   offsetY: number;
   rotation: number;
-  forwardedRef?: React.RefObject<HTMLCanvasElement>;
+  forwardedRef?: React.RefObject<HTMLCanvasElement | null>;
   onOffsetXChange?: (value: number) => void;
   onOffsetYChange?: (value: number) => void;
 }
