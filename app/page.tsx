@@ -78,8 +78,8 @@ export default function Home() {
                 onOffsetYChange={setOffsetY}
               />
             </div>
-            <div className="my-1 text-center text-xs text-blue-200/40">
-              Built With love by <a href="https://abssyd.xyz" className="text-amber-400 hover:text-amber-300 transition-colors">Abu Sayed</a>
+            <div className="my-1 text-center text-xs text-gray-300">
+              Built With love by <a href="https://abssyd.xyz" className="text-blue-300 hover:text-blue-400 underline transition-colors">Abu Sayed</a>
             </div>
             {/* Upload Section - Only show when no image uploaded */}
             {!uploadedImage && (

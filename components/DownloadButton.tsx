@@ -31,7 +31,7 @@ export function DownloadButton({ canvasRef, isImageLoaded }: DownloadButtonProps
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `cst-titans-attending-card-${Date.now()}.png`;
+        link.download = `cst3-attending-card-by-ABSYD[absyd.xyz]-${Date.now()}.png`;
 
         // Trigger download
         document.body.appendChild(link);
