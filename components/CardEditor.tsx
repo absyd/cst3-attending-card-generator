@@ -11,6 +11,7 @@ interface CardEditorProps {
   forwardedRef?: React.RefObject<HTMLCanvasElement | null>;
   onOffsetXChange?: (value: number) => void;
   onOffsetYChange?: (value: number) => void;
+  onScaleChange?: (value: number) => void; // ✅ NEW
 }
 
 export function CardEditor({
@@ -22,6 +23,7 @@ export function CardEditor({
   forwardedRef,
   onOffsetXChange,
   onOffsetYChange,
+  onScaleChange,
 }: CardEditorProps) {
   const internalCanvasRef = useRef<HTMLCanvasElement>(null);
   const canvasRef = forwardedRef || internalCanvasRef;
@@ -30,7 +32,13 @@ export function CardEditor({
   const uploadedImageRef = useRef<HTMLImageElement | null>(null);
 
   const [isDragging, setIsDragging] = useState(false);
+
   const dragStartRef = useRef({ x: 0, y: 0, offsetX: 0, offsetY: 0 });
+
+  const pinchStartRef = useRef<null | {
+    distance: number;
+    scale: number;
+  }>(null);
 
   // -----------------------------
   // LOAD TEMPLATE
@@ -72,7 +80,7 @@ export function CardEditor({
   }, [scale, offsetX, offsetY, rotation]);
 
   // -----------------------------
-  // COORDINATE CONVERSION
+  // COORDINATES
   // -----------------------------
   const getCanvasCoordinates = useCallback((clientX: number, clientY: number) => {
     const canvas = canvasRef.current;
@@ -87,31 +95,10 @@ export function CardEditor({
   }, [canvasRef]);
 
   // -----------------------------
-  // OPTIONAL HIT AREA CHECK
+  // DRAG
   // -----------------------------
-  const isPointInPhotoArea = useCallback((x: number, y: number) => {
-    if (!templateImageRef.current) return false;
-
-    const circleX = 370;
-    const circleY = 630;
-    const circleRadius = templateImageRef.current.naturalWidth * 0.24;
-
-    const dx = x - circleX;
-    const dy = y - circleY;
-
-    return dx * dx + dy * dy <= circleRadius * circleRadius;
-  }, []);
-
-  // -----------------------------
-  // DRAG START
-  // -----------------------------
-  const startDrag = useCallback((clientX: number, clientY: number) => {
+  const startDrag = (clientX: number, clientY: number) => {
     if (!uploadedImageRef.current) return;
-
-    const coords = getCanvasCoordinates(clientX, clientY);
-
-    // 🔴 Toggle this if you want free drag everywhere
-    // if (!isPointInPhotoArea(coords.x, coords.y)) return;
 
     setIsDragging(true);
 
@@ -121,12 +108,9 @@ export function CardEditor({
       offsetX,
       offsetY,
     };
-  }, [getCanvasCoordinates, isPointInPhotoArea, offsetX, offsetY]);
+  };
 
-  // -----------------------------
-  // DRAG MOVE
-  // -----------------------------
-  const moveDrag = useCallback((clientX: number, clientY: number) => {
+  const moveDrag = (clientX: number, clientY: number) => {
     if (!isDragging || !onOffsetXChange || !onOffsetYChange) return;
 
     const canvas = canvasRef.current;
@@ -140,17 +124,23 @@ export function CardEditor({
 
     onOffsetXChange(Math.round(dragStartRef.current.offsetX + dx));
     onOffsetYChange(Math.round(dragStartRef.current.offsetY + dy));
-  }, [isDragging, onOffsetXChange, onOffsetYChange, canvasRef]);
+  };
 
-  // -----------------------------
-  // END DRAG
-  // -----------------------------
-  const endDrag = useCallback(() => {
+  const endDrag = () => {
     setIsDragging(false);
-  }, []);
+  };
 
   // -----------------------------
-  // GLOBAL MOUSE UP FIX
+  // PINCH HELPERS
+  // -----------------------------
+  const getDistance = (touches: React.TouchList) => {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  // -----------------------------
+  // GLOBAL END FIX
   // -----------------------------
   useEffect(() => {
     window.addEventListener('mouseup', endDrag);
@@ -160,10 +150,10 @@ export function CardEditor({
       window.removeEventListener('mouseup', endDrag);
       window.removeEventListener('touchend', endDrag);
     };
-  }, [endDrag]);
+  }, []);
 
   // -----------------------------
-  // DRAW CANVAS
+  // DRAW
   // -----------------------------
   const drawCanvas = () => {
     const canvas = canvasRef.current;
@@ -175,7 +165,6 @@ export function CardEditor({
     const template = templateImageRef.current;
     const dpr = window.devicePixelRatio || 1;
 
-    // FIX: reset transform
     ctx.setTransform(1, 0, 0, 1, 0, 0);
 
     canvas.width = template.naturalWidth * dpr;
@@ -183,7 +172,6 @@ export function CardEditor({
 
     ctx.scale(dpr, dpr);
 
-    // Draw template
     ctx.drawImage(template, 0, 0, template.naturalWidth, template.naturalHeight);
 
     if (!uploadedImageRef.current) return;
@@ -196,7 +184,6 @@ export function CardEditor({
 
     ctx.save();
 
-    // Clip circle
     ctx.beginPath();
     ctx.arc(circleX, circleY, circleRadius, 0, Math.PI * 2);
     ctx.clip();
@@ -228,7 +215,10 @@ export function CardEditor({
         className={`max-w-full h-auto rounded-lg shadow-2xl ${
           uploadedImage ? 'cursor-grab active:cursor-grabbing' : ''
         } ${isDragging ? 'cursor-grabbing' : ''}`}
-        style={{ maxHeight: '500px', touchAction: 'none' }}
+        style={{
+          maxHeight: '500px',
+          touchAction: 'pan-x pan-y', // ✅ FIXED
+        }}
         draggable={false}
 
         // MOUSE
@@ -240,23 +230,53 @@ export function CardEditor({
         onMouseUp={endDrag}
         onMouseLeave={endDrag}
 
-        // TOUCH
+        // TOUCH START
         onTouchStart={(e) => {
-          e.preventDefault();
-          const t = e.touches[0];
-          startDrag(t.clientX, t.clientY);
+          if (e.touches.length === 1) {
+            const t = e.touches[0];
+            startDrag(t.clientX, t.clientY);
+          }
+
+          if (e.touches.length === 2) {
+            pinchStartRef.current = {
+              distance: getDistance(e.touches),
+              scale: scale,
+            };
+          }
         }}
+
+        // TOUCH MOVE
         onTouchMove={(e) => {
-          e.preventDefault();
-          const t = e.touches[0];
-          moveDrag(t.clientX, t.clientY);
+          if (e.touches.length === 1 && isDragging) {
+            const t = e.touches[0];
+            moveDrag(t.clientX, t.clientY);
+          }
+
+          if (e.touches.length === 2 && pinchStartRef.current) {
+            e.preventDefault();
+
+            const newDistance = getDistance(e.touches);
+            const scaleChange = newDistance / pinchStartRef.current.distance;
+
+            let newScale = pinchStartRef.current.scale * scaleChange;
+
+            // optional clamp
+            newScale = Math.max(0.2, Math.min(newScale, 5));
+
+            onScaleChange?.(newScale);
+          }
         }}
-        onTouchEnd={endDrag}
+
+        // TOUCH END
+        onTouchEnd={() => {
+          endDrag();
+          pinchStartRef.current = null;
+        }}
       />
 
       {uploadedImage && !isDragging && (
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/70 text-white text-sm px-3 py-1.5 rounded-full pointer-events-none">
-          Drag photo to position
+          Drag or pinch to adjust
         </div>
       )}
     </div>

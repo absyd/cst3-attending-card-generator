@@ -74,6 +74,7 @@ export default function Home() {
                 offsetY={offsetY}
                 rotation={rotation}
                 forwardedRef={canvasRef}
+                onScaleChange={setScale}
                 onOffsetXChange={setOffsetX}
                 onOffsetYChange={setOffsetY}
               />
