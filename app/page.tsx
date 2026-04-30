@@ -40,13 +40,19 @@ export default function Home() {
 
       <div className="relative max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-2 flex flex-col sm:flex-row justify-center items-center gap-4">
+        <div className="text-center mb-2 flex  justify-center items-center gap-4">
           <div className=" ">
-            <img src="/images/final-logo.png" className='h-16 w-16 sm:h-20 sm:w-20 rounded-full border-2 border-amber-400/50' alt="CST Tech Titans Logo" />
+            <img src="/images/final-logo.png" className='h-10 w-10 sm:h-20 sm:w-20 rounded-full border-2 border-amber-400/50' alt="CST Tech Titans Logo" />
           </div>
-          <h1 className="text-xl sm:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 px-2">
+          <h1 className="text-xl md:d-block hidden sm:block sm:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 px-2">
             <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 bg-clip-text text-transparent">
               CST TECH TITANS TROPHY CARD GENERATOR
+            </span>
+          </h1>
+
+          <h1 className="text-xl md:hidden d-block sm:block sm:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 px-2">
+            <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 bg-clip-text text-transparent">
+              CST3 CARD GENERATOR
             </span>
           </h1>
         </div>
@@ -55,11 +61,11 @@ export default function Home() {
         <div className="flex flex-col lg:grid lg:grid-cols-2 gap-6 lg:gap-8">
           {/* Preview Section - Full width on mobile */}
           <div className="flex flex-col order-1 lg:order-1">
-            <div className="mb-3 sm:mb-4 flex items-center gap-2">
+            {/* <div className="mb-3 sm:mb-4 flex items-center gap-2">
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
               <h2 className="text-base sm:text-lg font-semibold text-amber-100/90">Preview</h2>
               <div className="h-px flex-1 bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
-            </div>
+            </div> */}
             <div className="bg-[#0d1d35] rounded-lg sm:rounded-xl p-3 sm:p-4 border border-amber-500/20 shadow-2xl shadow-blue-950/50">
               <CardEditor
                 uploadedImage={uploadedImage}
@@ -75,6 +81,16 @@ export default function Home() {
             <div className="my-1 text-center text-xs text-blue-200/40">
               Built With love by <a href="https://abssyd.xyz" className="text-amber-400 hover:text-amber-300 transition-colors">Abu Sayed</a>
             </div>
+            {/* Upload Section - Only show when no image uploaded */}
+            {!uploadedImage && (
+              <div className="bg-[#0d1d35] rounded-lg sm:rounded-xl p-4 sm:p-6 border border-amber-500/20 shadow-lg">
+                {/* <div className="flex items-center gap-3 mb-3 sm:mb-4">
+                  <div className="w-1 h-5 sm:h-6 bg-gradient-to-b from-amber-400 to-amber-600 rounded-full" />
+                  <h2 className="text-base sm:text-lg font-semibold text-amber-100/90">Upload Photo</h2>
+                </div> */}
+                <ImageUploader onImageUpload={handleImageUpload} />
+              </div>
+            )}
             <div className="mt-2">
               <DownloadButton canvasRef={canvasRef as React.RefObject<HTMLCanvasElement>} isImageLoaded={!!uploadedImage} />
             </div>
@@ -82,16 +98,7 @@ export default function Home() {
 
           {/* Controls Section - Full width on mobile */}
           <div className="flex flex-col gap-4 sm:gap-6 order-2 lg:order-2">
-            {/* Upload Section - Only show when no image uploaded */}
-            {!uploadedImage && (
-              <div className="bg-[#0d1d35] rounded-lg sm:rounded-xl p-4 sm:p-6 border border-amber-500/20 shadow-lg">
-                <div className="flex items-center gap-3 mb-3 sm:mb-4">
-                  <div className="w-1 h-5 sm:h-6 bg-gradient-to-b from-amber-400 to-amber-600 rounded-full" />
-                  <h2 className="text-base sm:text-lg font-semibold text-amber-100/90">Upload Photo</h2>
-                </div>
-                <ImageUploader onImageUpload={handleImageUpload} />
-              </div>
-            )}
+            
 
             {/* Adjustment Controls - Show when image uploaded */}
             {uploadedImage && (
