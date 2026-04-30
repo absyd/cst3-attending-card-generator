@@ -7,25 +7,33 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Tournament Card Customizer',
-  description: 'Upload your photo and create your CST Tech Titans tournament attending card',
-  generator: 'v0.app',
+  title: 'CST Tech Titans Trophy Card Generator',
+  description: 'Upload your photo and create your personalized CST Tech Titans tournament attending card. Built for the CST3 Tech Titans event.',
+  keywords: ['CST Tech Titans', 'CST3', 'Tournament Card', 'Card Generator', 'Tech Titans', 'CST'],
+  authors: [{ name: 'Abu Sayed', url: 'https://absyd.xyz' }],
+  creator: 'Abu Sayed',
+  metadataBase: new URL('https://cst3-card-generator.vercel.app'),
+  openGraph: {
+    title: 'CST Tech Titans Trophy Card Generator',
+    description: 'Create your personalized tournament attending card for CST Tech Titans',
+    type: 'website',
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'CST Tech Titans Trophy Card Generator',
+    description: 'Create your personalized tournament attending card',
+  },
   icons: {
     icon: [
       {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
+        url: '/images/final-logo.png',
+        type: 'image/png',
+        sizes: 'any',
       },
     ],
-    apple: '/apple-icon.png',
+    apple: '/images/final-logo.png',
+    shortcut: '/images/final-logo.png',
   },
 }
 
