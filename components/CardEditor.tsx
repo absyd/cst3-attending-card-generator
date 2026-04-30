@@ -81,9 +81,12 @@ export function CardEditor({
       const canvasHeight = templateImg.naturalHeight;
 
       // Calculate circle parameters
-      const circleX = canvasWidth / 2;
-      const circleY = canvasHeight * 0.35;
-      const circleRadius = canvasWidth * 0.3;
+      // do not change the paremeters below 
+      const circleX = 370;
+      // do not change the paremeters below 
+      const circleY = 630;
+      // do not change the paremeters below 
+      const circleRadius = canvasWidth * 0.24;
 
       // Save context state
       ctx.save();
