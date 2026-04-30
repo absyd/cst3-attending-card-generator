@@ -79,8 +79,10 @@ export default function Home() {
                 onOffsetYChange={setOffsetY}
               />
             </div>
-            <div className="my-1 text-center text-xs text-gray-300">
-              Built With love by <a href="https://abssyd.xyz" className="text-blue-300 hover:text-blue-400 underline transition-colors">Abu Sayed</a>
+            <div className="flex flex-col items-center justify-center mt-2 text-center text-xs text-gray-300">
+              <p className="">Drag or Pinch to adjust position and scale</p>
+              <span className="text-sm ">Built with love by <a href="https://abssyd.xyz" className="text-blue-300 hover:text-blue-400 underline transition-colors">Abu Sayed</a></span>
+              
             </div>
             {/* Upload Section - Only show when no image uploaded */}
             {!uploadedImage && (
